@@ -15,6 +15,7 @@ library(raster)
 library(sf)
 library(data.table)
 library(ggplot2)
+library(terra)
 
 
 
@@ -262,7 +263,56 @@ for (i in 1:length(Prod_SH$shapeName)){
 
 # Create the final raster with Prod area:
 Prod_raster <- do.call(merge,resultFinal)
-plot(Prod_raster) + title("Adjusted Cassava Production 2023")
+writeRaster(Prod_raster, "host_production_raw.tif", overwrite = TRUE)
 
-
-
+# 
+# plot(Prod_raster) + title("Adjusted Cassava Production 2023")
+# 
+# # normalise between 0 and 1
+# max_value <- cellStats(Prod_raster, stat = "max", na.rm = TRUE)
+# Prod_raster_normalised = Prod_raster/max_value
+# 
+# # Your existing raster
+# r <- Prod_raster_normalised  # Assuming this is already loaded
+# 
+# # Define new extent using XLLCORNER, YLLCORNER, NCOLS, NROWS, and CELLSIZE
+# ncols <- 1668
+# nrows <- 1154
+# cellsize <- 0.008333333330
+# xll <- 0.775000000000
+# yll <- 4.26666666724102
+# 
+# # Calculate new extent
+# xmax <- xll + ncols * cellsize
+# ymax <- yll + nrows * cellsize
+# new_extent <- extent(xll, xmax, yll, ymax)
+# 
+# # Create a new raster template with this extent and resolution
+# template <- raster(ncols = ncols, nrows = nrows, ext = new_extent,
+#                    crs = crs(r))  # Use same CRS as original raster
+# 
+# # Align your raster to this new template, filling missing values with NA
+# # (or use a specific value with `NAvalue()` if needed)
+# r_aligned <- resample(r, template, method = "bilinear")  # or 'ngb' for nearest neighbor
+# 
+# # Optional: Set a NoData value explicitly if needed
+# NAvalue(r_aligned) <- -9999  # Example no-data value
+# 
+# # any values below 
+# 
+# # Export 
+# writeRaster(r_aligned, "L_0_HOSTDENSITY.txt",format = "ascii", overwrite = TRUE)
+# 
+# 
+# # open value 
+# host_raster_old <- raster("../../simple_run/L_0_HOSTDENSITY.txt")
+# # Extract all values from the raster
+# vals <- getValues(r_aligned)
+# 
+# # Remove NAs
+# vals <- vals[!is.na(vals)]
+# 
+# # Get unique sorted values
+# lowest_five <- sort(unique(vals))[1:5]
+# 
+# print(lowest_five)

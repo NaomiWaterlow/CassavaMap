@@ -24,7 +24,7 @@ p_original_ha <- plot(orig_nigeria_ha) + title("Originial 2014 Harvest Area")
 my_colors <- viridis(100)
 
 # plot them out
-par(mfrow = c(2, 2))  # 2x2 grid
+par(mfrow = c(1, 2))  # 2x2 grid
 plot(orig_nigeria_ha, main = "Original 2014 Harvest Area", col = my_colors)
 plot(orig_nigeria, main = "Original 2014 Production", col = my_colors)
 
