@@ -41,6 +41,18 @@ Data_Adm_Prod <- read.csv("AgroMaps_data/IITA_Cassava_2023_edited.csv")
 FAOSTAT23 <- read.csv("FAO/FAOSTAT_data_2023.csv")
 FAOSTAT23 <- data.table(FAOSTAT23[FAOSTAT23$Element == "Production",])
 
+# load in the old raster to extract Borno (as missing in new one)
+# want to add the old version of Borno back in at the end, so need to remove the numbers
+# from FAOSTAT23
+host_raster <- raster("CassavaMap_Prod_v1.tif")
+Borno = Shape_Adm[Shape_Adm$shapeName == "Borno", ]
+borno_raster = mask(crop(host_raster, Borno), Borno)
+vals <- getValues(borno_raster)
+vals <- vals[!is.na(vals)]
+sum_vals <- sum(vals)
+# remove that value from FAO stat (they are on same scale)
+FAOSTAT23[Area == "Nigeria", Value := Value -sum_vals]
+
 # List countries that you want to work on - as example Uganda is given but can be a longer list
 CountryList <- "Nigeria"
 
@@ -264,6 +276,9 @@ for (i in 1:length(Prod_SH$shapeName)){
 # Create the final raster with Prod area:
 Prod_raster <- do.call(merge,resultFinal)
 writeRaster(Prod_raster, "host_production_raw.tif", overwrite = TRUE)
+
+# 
+
 
 # 
 # plot(Prod_raster) + title("Adjusted Cassava Production 2023")
